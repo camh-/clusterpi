@@ -11,12 +11,12 @@
 # $1: Path to images directory
 # $2: dtb file
 #
-# CWD is the board image directory ($BRP_IMAGE_DIR)
+# CWD is the board image directory ($LBR_IMAGE_DIR)
 #
-# brp defines:
-# BRP_BOARD_DIR: The directory contain the board files in the source tree
-# BRP_IMAGE_DIR: The directory containing all the image outputs from each phase
-# BRP_OUTPUT_DIR: The root output directory containing the output dirs
+# lbr defines:
+# LBR_BOARD_DIR: The directory contain the board files in the source tree
+# LBR_IMAGE_DIR: The directory containing all the image outputs from each phase
+# LBR_OUTPUT_DIR: The root output directory containing the output dirs
 #   for each phase.
 #
 # TODO(camh): rewrite this as a makefile
@@ -25,9 +25,9 @@
 # Unused vars are used via indirection
 init() {
   uenv_req=($(collate uboot-env.txt))
-  sdcard_req=("${BRP_IMAGE_DIR}"/{zImage,board.dtb})
-  sdcard_sdroot_req=("${BRP_IMAGE_DIR}"/{rootfs.ext4,sdroot/uboot-env.bin})
-  sdcard_nfsroot_req=("${BRP_IMAGE_DIR}"/nfsroot/uboot-env.bin)
+  sdcard_req=("${LBR_IMAGE_DIR}"/{zImage,board.dtb})
+  sdcard_sdroot_req=("${LBR_IMAGE_DIR}"/{rootfs.ext4,sdroot/uboot-env.bin})
+  sdcard_nfsroot_req=("${LBR_IMAGE_DIR}"/nfsroot/uboot-env.bin)
   dryrun=0
 }
 
@@ -42,8 +42,8 @@ main() {
 link_dtb() {
   # If $2 is present, it is the name of the dtb. Symlink "board.dtb" to it
   # so the genimage and boot config can be generic for sunxi.
-  if [[ -n "$2" ]] && [[ -f "${BRP_IMAGE_DIR}/$2" ]]; then
-    ln -sf "$2" "${BRP_IMAGE_DIR}/board.dtb"
+  if [[ -n "$2" ]] && [[ -f "${LBR_IMAGE_DIR}/$2" ]]; then
+    ln -sf "$2" "${LBR_IMAGE_DIR}/board.dtb"
   fi
 }
 
@@ -62,7 +62,7 @@ make_uboot_env_image() {
     return
   fi
 
-  local bootdir="${BRP_IMAGE_DIR}/$1"
+  local bootdir="${LBR_IMAGE_DIR}/$1"
   local txtenv="${bootdir}/uboot-env.txt"
   local binenv="${bootdir}/uboot-env.bin"
 
@@ -80,19 +80,19 @@ make_sdcard_image() {
 
   local GENIMAGE_CFG GENIMAGE_TMP ROOTPATH_TMP
   GENIMAGE_CFG=$(locate "${1}/genimage.cfg")
-  GENIMAGE_TMP=$(mktemp -d "${BRP_IMAGE_DIR}/genimage.XXXXXXXXX")
+  GENIMAGE_TMP=$(mktemp -d "${LBR_IMAGE_DIR}/genimage.XXXXXXXXX")
   ROOTPATH_TMP=$(mktemp -d -t "genimage.root.XXXXXXXXX")
 
   cleanup() { rm -rf "${GENIMAGE_TMP}" "${ROOTPATH_TMP}"; }
 
   trap cleanup EXIT
 
-  mkdir -p "${BRP_IMAGE_DIR}/${1}"
+  mkdir -p "${LBR_IMAGE_DIR}/${1}"
   run genimage \
     --rootpath "${ROOTPATH_TMP}" \
     --tmppath "${GENIMAGE_TMP}" \
-    --inputpath "${BRP_IMAGE_DIR}" \
-    --outputpath "${BRP_IMAGE_DIR}/${1}" \
+    --inputpath "${LBR_IMAGE_DIR}" \
+    --outputpath "${LBR_IMAGE_DIR}/${1}" \
     --config "${GENIMAGE_CFG}"
 
   cleanup
@@ -100,10 +100,10 @@ make_sdcard_image() {
 }
 
 copy_felboot() {
-  run cp "$(locate "felboot")" "${BRP_IMAGE_DIR}"
+  run cp "$(locate "felboot")" "${LBR_IMAGE_DIR}"
   if [[ -x "${HOST_DIR}/bin/sunxi-fel" ]]; then
     run sed -i '/: ${HOST_DIR:=}/s|.*|: ${HOST_DIR:='"${HOST_DIR}"'}|' \
-      "${BRP_IMAGE_DIR}/felboot"
+      "${LBR_IMAGE_DIR}/felboot"
   fi
 }
 
@@ -121,7 +121,7 @@ req() {
 }
 
 collate() {
-  _collate "${BRP_BOARD_DIR}" "$1"
+  _collate "${LBR_BOARD_DIR}" "$1"
 }
 
 _collate() {
@@ -134,7 +134,7 @@ _collate() {
 }
 
 locate() {
-  _locate "${BRP_BOARD_DIR}" "$1"
+  _locate "${LBR_BOARD_DIR}" "$1"
 }
 
 _locate() {
