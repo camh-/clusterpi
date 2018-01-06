@@ -49,6 +49,7 @@ link_dtb() {
 
 make_images() {
   for image; do
+    message "Building ${image} image"
     make_uboot_env_image "${image}"
     make_sdcard_image "${image}"
   done
@@ -145,6 +146,12 @@ _locate() {
   else
     return 1
   fi
+}
+
+message() {
+  tput smso   # bold
+  printf '>>> build-image %s\n' "$*"
+  tput rmso   # normal
 }
 
 #-----------------------------------------------------------------------------
