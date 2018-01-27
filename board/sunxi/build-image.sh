@@ -31,6 +31,7 @@ init() {
 }
 
 main() {
+  checkenv LBR_IMAGE_DIR LBR_BOARD_DIR LBR_OUTPUT_ROOT
   init
   link_images "$2" "$3"
   make_images sdroot nfsroot uboot tftpboot
@@ -119,6 +120,7 @@ make_sdcard_image() {
 }
 
 copy_felboot() {
+  checkenv HOST_DIR
   run cp "$(locate "felboot")" "${LBR_IMAGE_DIR}"
   if [[ -x "${HOST_DIR}/bin/sunxi-fel" ]]; then
     run sed -i '/: ${HOST_DIR:=}/s|.*|: ${HOST_DIR:='"${HOST_DIR}"'}|' \
@@ -185,6 +187,15 @@ message() {
   tput smso   # bold
   printf '>>> build-image %s\n' "$*"
   tput rmso   # normal
+}
+
+checkenv() {
+  for ev; do
+    if [[ -z "${!ev:-}" ]]; then
+      printf 'Envvar %s not set. Are you running from lbr?\n' "${ev}"
+      exit 1
+    fi
+  done
 }
 
 #-----------------------------------------------------------------------------
