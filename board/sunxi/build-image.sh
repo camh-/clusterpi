@@ -16,15 +16,14 @@
 # lbr defines:
 # LBR_BOARD_DIR: The directory contain the board files in the source tree
 # LBR_IMAGE_DIR: The directory containing all the image outputs from each phase
-# LBR_OUTPUT_DIR: The root output directory containing the output dirs
-#   for each phase.
+# LBR_OUTPUT_ROOT: The root output directory containing the output dirs
+#   for board.
 #
 # TODO(camh): rewrite this as a makefile
 
 # shellcheck disable=SC2034
 # Unused vars are used via indirection
 init() {
-  uenv_req=($(collate uboot-env.txt))
   sdcard_req=("${LBR_IMAGE_DIR}"/{zImage,board.dtb})
   sdcard_sdroot_req=("${LBR_IMAGE_DIR}"/{rootfs.ext4,sdroot/uboot-env.bin})
   sdcard_nfsroot_req=("${LBR_IMAGE_DIR}"/nfsroot/uboot-env.bin)
@@ -33,17 +32,36 @@ init() {
 
 main() {
   init
-  link_dtb "$@"
+  link_images "$2" "$3"
   make_images sdroot nfsroot uboot tftpboot
   make_uboot_env_image rdroot
   copy_felboot
 }
 
-link_dtb() {
-  # If $2 is present, it is the name of the dtb. Symlink "board.dtb" to it
-  # so the genimage and boot config can be generic for sunxi.
-  if [[ -n "$2" ]] && [[ -f "${LBR_IMAGE_DIR}/$2" ]]; then
-    ln -sf "$2" "${LBR_IMAGE_DIR}/board.dtb"
+link_images() {
+  # $1 is the name of the layer with the root fs to put in the image,
+  # $2 is the name of the device tree.
+  # We search for these through the image dirs of us and our parents
+  # and if we find them, link them into our image dir with a generic
+  # name, so the genimage.cfg file can use generic names.
+  local rootfs dtb kernel
+
+  rootfs=$(locate_image "rootfs-$1.ext4")
+  if [[ -n "${rootfs}" ]]; then
+    run ln -nsf "$(realpath --relative-to="${LBR_IMAGE_DIR}" "${rootfs}")" \
+      "${LBR_IMAGE_DIR}/rootfs.ext4"
+  fi
+
+  dtb=$(locate_image "$2.dtb")
+  if [[ -n "${dtb}" ]]; then
+    run ln -nsf "$(realpath --relative-to="${LBR_IMAGE_DIR}" "${dtb}")" \
+      "${LBR_IMAGE_DIR}/board.dtb"
+  fi
+
+  kernel=$(locate_image 'zImage')
+  if [[ -n "${kernel}" ]]; then
+    run ln -nsf "$(realpath --relative-to="${LBR_IMAGE_DIR}" "${kernel}")" \
+      "${LBR_IMAGE_DIR}/zImage"
   fi
 }
 
@@ -56,9 +74,9 @@ make_images() {
 }
 
 make_uboot_env_image() {
-  local env
+  local env missing
   env="$(locate "${1}/uboot-env.txt")"
-  if ! missing=$(req "${uenv_req[@]}" "${env}"); then
+  if ! missing=$(req "${env}"); then
     echo "Not making ${1} uboot env image. Missing: $missing"
     return
   fi
@@ -143,6 +161,21 @@ _locate() {
     readlink -f "$1/$2"
   elif [[ -L "$1/parent" ]] ; then
     _locate "$1/parent" "$2"
+  else
+    return 1
+  fi
+}
+
+locate_image() {
+  _locate_image "${LBR_BOARD_DIR}" "$1"
+}
+
+_locate_image() {
+  local image_dir="${LBR_OUTPUT_ROOT}/${1##*/}/images"
+  if [[ -e "${image_dir}/$2" ]]; then
+    printf '%s/%s\n' "${image_dir}" "$2"
+  elif [[ -L "$1/parent" ]]; then
+    _locate_image "$(realpath "$1/parent")" "$2"
   else
     return 1
   fi
