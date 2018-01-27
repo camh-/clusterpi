@@ -27,7 +27,9 @@ init() {
   sdcard_req=("${LBR_IMAGE_DIR}"/{zImage,board.dtb})
   sdcard_sdroot_req=("${LBR_IMAGE_DIR}"/{rootfs.ext4,sdroot/uboot-env.bin})
   sdcard_nfsroot_req=("${LBR_IMAGE_DIR}"/nfsroot/uboot-env.bin)
-  : ${dryrun:=}
+  # shellcheck disable=SC2154
+  # var may already be in environment
+  : "${dryrun=}"
 }
 
 main() {
@@ -87,6 +89,8 @@ make_uboot_env_image() {
   local binenv="${bootdir}/uboot-env.bin"
 
   mkdir -p "${bootdir}"
+  # shellcheck disable=SC2046
+  # We want word splitting on $(collate ...)
   run cat - $(collate uboot-env.txt) "${env}" <<<'#=uEnv' >"${txtenv}"
   run mkenvimage -s 0x20000 -o "${binenv}" "${txtenv}"
 }
@@ -123,6 +127,8 @@ copy_felboot() {
   checkenv HOST_DIR
   run cp "$(locate "felboot")" "${LBR_IMAGE_DIR}"
   if [[ -x "${HOST_DIR}/bin/sunxi-fel" ]]; then
+    # shellcheck disable=SC2016
+    # Not trying to expand in single quotes. Looking a literal var
     run sed -i '/: ${HOST_DIR:=}/s|.*|: ${HOST_DIR:='"${HOST_DIR}"'}|' \
       "${LBR_IMAGE_DIR}/felboot"
   fi
