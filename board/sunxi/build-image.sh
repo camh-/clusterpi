@@ -28,7 +28,7 @@ init() {
   sdcard_req=("${LBR_IMAGE_DIR}"/{zImage,board.dtb})
   sdcard_sdroot_req=("${LBR_IMAGE_DIR}"/{rootfs.ext4,sdroot/uboot-env.bin})
   sdcard_nfsroot_req=("${LBR_IMAGE_DIR}"/nfsroot/uboot-env.bin)
-  dryrun=0
+  : ${dryrun:=}
 }
 
 main() {
@@ -68,7 +68,7 @@ make_uboot_env_image() {
   local binenv="${bootdir}/uboot-env.bin"
 
   mkdir -p "${bootdir}"
-  echo '#=uEnv' | cat - "${uenv_req[@]}" "${env}" > "${txtenv}"
+  run cat - $(collate uboot-env.txt) "${env}" <<<'#=uEnv' >"${txtenv}"
   run mkenvimage -s 0x20000 -o "${binenv}" "${txtenv}"
 }
 
@@ -111,7 +111,7 @@ copy_felboot() {
 #-----------------------------------------------------------------------------
 run() {
   echo "$@"
-  (( dryrun == 1 )) || "$@"
+  [[ -n "${dryrun}" ]] || "$@"
 }
 
 req() {
