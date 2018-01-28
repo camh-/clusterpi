@@ -1,0 +1,2 @@
+LBR_CONFIG_FRAGMENTS="local sdk_client overlay"
+LBR_POST_IMAGE_SCRIPTS="build-image.sh"
