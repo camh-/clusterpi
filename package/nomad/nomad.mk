@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-NOMAD_VERSION = v0.6.0
+NOMAD_VERSION = v0.7.1
 NOMAD_SITE = $(call github,hashicorp,nomad,$(NOMAD_VERSION))
 NOMAD_LICENSE = MPL-2.0
 NOMAD_LICENSE_FILES = LICENSE
