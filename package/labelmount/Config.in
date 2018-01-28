@@ -1,0 +1,8 @@
+config BR2_PACKAGE_LABELMOUNT
+	bool "Auto-mount filesystems with labels by label name"
+	depends on BR2_PACKAGE_HAS_UDEV
+	select BR2_PACKAGE_UTIL_LINUX
+	select BR2_PACKAGE_UTIL_LINUX_BINARIES
+	help
+	  Use udev to mount partitions as they appear using their label name
+	  as a mount point, if they have a label.
