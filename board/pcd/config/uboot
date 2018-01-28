@@ -1,0 +1,2 @@
+BR2_TARGET_UBOOT_BOARD_DEFCONFIG="Linksprite_pcDuino3_Nano"
+LBR_CONFIG_FRAGMENTS="local sdk_client overlay"

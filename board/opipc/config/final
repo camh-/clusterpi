@@ -1,2 +1,2 @@
 LBR_CONFIG_FRAGMENTS="local sdk_client overlay"
-LBR_OVERLAY_IMAGES="arm-a7-gnueabihf/base bk"
+LBR_OVERLAY_IMAGES="arm-a7-gnueabihf/base uboot linux"
