@@ -1,0 +1,43 @@
+config BR2_PACKAGE_KUBERNETES
+	bool "Kubernetes cluster scheduler"
+	depends on BR2_PACKAGE_HOST_GO_ARCH_SUPPORTS
+	depends on BR2_PACKAGE_HOST_GO_CGO_LINKING_SUPPORTS
+	depends on BR2_TOOLCHAIN_HAS_THREADS
+	help
+	  Kubernetes cluster scheduler.
+
+	  https://kubernetes.io
+
+if BR2_PACKAGE_KUBERNETES
+
+config BR2_PACKAGE_KUBERNETES_BOOTSTRAP
+	bool "Kubernetes components to bootstrap cluster"
+	default y
+	help
+	  Build just the kubernetes components needed to bootstrap a
+	  cluster. Most of the necessary components can be run as
+	  kubernetes pods, so those components will be pulled down in
+	  a container image. They do not need to be built by buildroot.
+
+	  The bootstrap components are kubelet, kubeadm and kubectl.
+
+config BR2_PACKAGE_KUBERNETES_SERVER
+	bool "Kubernetes server components"
+	default n
+	help
+	  Build kubernetes components for running an API server (master).
+
+config BR2_PACKAGE_KUBERNETES_NODE
+	bool "Kubernetes node components"
+	default n
+	help
+	  Build kubernetes components for running a node. This includes
+	  kube-proxy, kubeadm and kubelet.
+
+config BR2_PACKAGE_KUBERNETES_CLIENT
+	bool "Kubernetes client components"
+	default n
+	help
+	  Build kubernetes components for a client - the kubectl command.
+
+endif

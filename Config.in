@@ -1,4 +1,5 @@
 source "$BR2_EXTERNAL_clusterpi_PATH/package/jsonnet/Config.in"
+source "$BR2_EXTERNAL_clusterpi_PATH/package/kubernetes/Config.in"
 source "$BR2_EXTERNAL_clusterpi_PATH/package/labelmount/Config.in"
 source "$BR2_EXTERNAL_clusterpi_PATH/package/nomad/Config.in"
 source "$BR2_EXTERNAL_clusterpi_PATH/package/sunxi-fel/Config.in.host"
