@@ -1,0 +1,10 @@
+config BR2_PACKAGE_JSONNET
+	bool "Jsonnet data templating tool"
+	depends on BR2_PACKAGE_HOST_GO_ARCH_SUPPORTS
+	depends on BR2_PACKAGE_HOST_GO_CGO_LINKING_SUPPORTS
+	depends on BR2_TOOLCHAIN_HAS_THREADS
+	help
+	  Jsonnet data templating tool. The jsonnet command line program
+	  converts jsonnet files into json files.
+
+	  https://jsonnet.org
