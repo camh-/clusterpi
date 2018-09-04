@@ -21,11 +21,11 @@ config BR2_PACKAGE_KUBERNETES_BOOTSTRAP
 
 	  The bootstrap components are kubelet, kubeadm and kubectl.
 
-config BR2_PACKAGE_KUBERNETES_SERVER
-	bool "Kubernetes server components"
+config BR2_PACKAGE_KUBERNETES_MASTER
+	bool "Kubernetes master components"
 	default n
 	help
-	  Build kubernetes components for running an API server (master).
+	  Build kubernetes components for running kubernetes master.
 
 config BR2_PACKAGE_KUBERNETES_NODE
 	bool "Kubernetes node components"
