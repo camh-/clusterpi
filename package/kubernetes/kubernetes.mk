@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-KUBERNETES_VERSION = v1.11.1
+KUBERNETES_VERSION = v1.11.2
 KUBERNETES_SITE = $(call github,kubernetes,kubernetes,$(KUBERNETES_VERSION))
 KUBERNETES_LICENSE = Apache-2.0
 KUBERNETES_LICENSE_FILES = LICENSE
